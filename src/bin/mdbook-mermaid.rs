@@ -2,7 +2,7 @@ use clap::{crate_version, Arg, ArgMatches, Command};
 use mdbook_mermaid::Mermaid;
 use mdbook_preprocessor::errors::Error;
 use mdbook_preprocessor::Preprocessor;
-use toml_edit::{value, Array, Document, Item, Table, Value};
+use toml_edit::{value, Array, DocumentMut, Item, Table, Value};
 
 use std::{
     fs::{self, File},
@@ -100,7 +100,7 @@ fn handle_install(sub_args: &ArgMatches) -> ! {
     log::info!("Reading configuration file {}", config.display());
     let toml = fs::read_to_string(&config).expect("can't read configuration file");
     let mut doc = toml
-        .parse::<Document>()
+        .parse::<DocumentMut>()
         .expect("configuration is not valid TOML");
 
     let has_pre = has_preprocessor(&mut doc);
@@ -156,7 +156,7 @@ graph TD;
     process::exit(0);
 }
 
-fn add_additional_files(doc: &mut Document) -> bool {
+fn add_additional_files(doc: &mut DocumentMut) -> bool {
     let mut changed = false;
     let mut printed = false;
 
@@ -188,7 +188,7 @@ fn add_additional_files(doc: &mut Document) -> bool {
     changed
 }
 
-fn additional<'a>(doc: &'a mut Document, additional_type: &str) -> Option<&'a mut Array> {
+fn additional<'a>(doc: &'a mut DocumentMut, additional_type: &str) -> Option<&'a mut Array> {
     let doc = doc.as_table_mut();
 
     let item = doc.get_mut("output")?;
@@ -199,14 +199,14 @@ fn additional<'a>(doc: &'a mut Document, additional_type: &str) -> Option<&'a mu
     item.as_array_mut()
 }
 
-fn has_preprocessor(doc: &mut Document) -> bool {
+fn has_preprocessor(doc: &mut DocumentMut) -> bool {
     doc.get("preprocessor")
         .and_then(|p| p.get("mermaid"))
         .map(|m| matches!(m, Item::Table(_)))
         .unwrap_or(false)
 }
 
-fn add_preprocessor(doc: &mut Document) {
+fn add_preprocessor(doc: &mut DocumentMut) {
     let doc = doc.as_table_mut();
 
     let empty_table = Item::Table(Table::default());
@@ -230,7 +230,7 @@ fn has_file(elem: &Option<&mut Array>, file: &str) -> bool {
     }
 }
 
-fn insert_additional(doc: &mut Document, additional_type: &str, file: &str) {
+fn insert_additional(doc: &mut DocumentMut, additional_type: &str, file: &str) {
     let doc = doc.as_table_mut();
 
     let empty_table = Item::Table(Table::default());
