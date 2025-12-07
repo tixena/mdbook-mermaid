@@ -6,7 +6,7 @@ description = "mdbook preprocessor to add mermaid support"
 license = "MPL-2.0"
 homepage = "https://github.com/badboy/mdbook-mermaid"
 repository = "https://github.com/badboy/mdbook-mermaid"
-edition = "2018"
+edition = "2024"
 
 [dependencies]
 mdbook-preprocessor = "0.5"
@@ -15,7 +15,10 @@ env_logger = "0.11"
 log = "0.4"
 clap = { version = "4", features = ["cargo"] }
 serde_json = "1.0"
-toml_edit = { version = "0.23", default-features = false, features = ["parse", "display"] }
+toml_edit = { version = "0.23", default-features = false, features = [
+    "parse",
+    "display",
+] }
 
 [dev-dependencies]
 assert_cmd = "2"
